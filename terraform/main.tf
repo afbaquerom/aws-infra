@@ -40,6 +40,7 @@ resource "aws_api_gateway_integration" "hello_integration" {
   integration_http_method = "POST"
   type                    = "AWS_PROXY"
   uri                     = aws_lambda_function.hello_function.invoke_arn
+  credentials             = aws_iam_role.lambda_exec.arn
 }
 
 resource "aws_iam_role" "lambda_exec" {
