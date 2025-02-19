@@ -1,12 +1,20 @@
 resource "aws_api_gateway_rest_api" "api" {
   name        = "MyAPI"
   description = "API for the AWS GitHub Terraform Project"
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "aws_api_gateway_resource" "hello" {
   rest_api_id = aws_api_gateway_rest_api.api.id
   parent_id   = aws_api_gateway_rest_api.api.root_resource_id
   path_part   = "hello"
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "aws_api_gateway_method" "get_hello" {
@@ -14,6 +22,10 @@ resource "aws_api_gateway_method" "get_hello" {
   resource_id   = aws_api_gateway_resource.hello.id
   http_method   = "GET"
   authorization = "NONE"
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "aws_lambda_function" "hello_function" {
@@ -23,6 +35,10 @@ resource "aws_lambda_function" "hello_function" {
   role          = aws_iam_role.lambda_exec.arn
   filename      = "../source/lambda.zip"
   source_code_hash = filebase64sha256("../source/lambda.zip")
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "aws_lambda_permission" "api_gateway" {
@@ -31,6 +47,10 @@ resource "aws_lambda_permission" "api_gateway" {
   function_name = aws_lambda_function.hello_function.function_name
   principal     = "apigateway.amazonaws.com"
   source_arn    = "${aws_api_gateway_rest_api.api.execution_arn}/*/*"
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "aws_api_gateway_integration" "hello_integration" {
@@ -41,6 +61,10 @@ resource "aws_api_gateway_integration" "hello_integration" {
   type                    = "AWS_PROXY"
   uri                     = aws_lambda_function.hello_function.invoke_arn
   credentials             = aws_iam_role.lambda_exec.arn
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "aws_iam_role" "lambda_exec" {
@@ -67,6 +91,10 @@ resource "aws_iam_role" "lambda_exec" {
       }
     ]
   })
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "aws_iam_role_policy" "lambda_exec_policy" {
@@ -101,4 +129,8 @@ resource "aws_iam_role_policy" "lambda_exec_policy" {
       }
     ]
   })
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
