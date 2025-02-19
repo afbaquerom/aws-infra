@@ -57,6 +57,14 @@ resource "aws_iam_role" "lambda_exec" {
         Effect = "Allow"
         Sid    = ""
       },
+      {
+        Action = "sts:AssumeRole"
+        Principal = {
+          Service = "apigateway.amazonaws.com"
+        }
+        Effect = "Allow"
+        Sid    = ""
+      }
     ]
   })
 }
