@@ -18,9 +18,10 @@ resource "aws_api_gateway_method" "get_hello" {
 
 resource "aws_lambda_function" "hello_function" {
   function_name = "hello_function"
-  handler       = "main.handler"
+  handler       = "lambda.handler"
   runtime       = "python3.8"
   role          = aws_iam_role.lambda_exec.arn
+  filename      = "../source/lambda.zip"
   source_code_hash = filebase64sha256("../source/lambda.zip")
 }
 
