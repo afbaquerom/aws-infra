@@ -25,6 +25,14 @@ resource "aws_lambda_function" "hello_function" {
   source_code_hash = filebase64sha256("../source/lambda.zip")
 }
 
+resource "aws_lambda_permission" "api_gateway" {
+  statement_id  = "AllowAPIGatewayInvoke"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.hello_function.function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${aws_api_gateway_rest_api.api.execution_arn}/*/*"
+}
+
 resource "aws_api_gateway_integration" "hello_integration" {
   rest_api_id             = aws_api_gateway_rest_api.api.id
   resource_id             = aws_api_gateway_resource.hello.id
@@ -74,6 +82,13 @@ resource "aws_iam_role_policy" "lambda_exec_policy" {
           "lambda:InvokeFunction"
         ]
         Resource = aws_lambda_function.hello_function.arn
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "lambda:InvokeFunction"
+        ]
+        Resource = "arn:aws:lambda:*:*:function:hello_function"
       }
     ]
   })
