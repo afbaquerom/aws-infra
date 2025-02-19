@@ -21,6 +21,7 @@ resource "aws_lambda_function" "hello_function" {
   handler       = "main.handler"
   runtime       = "python3.8"
   role          = aws_iam_role.lambda_exec.arn
+  source_code_hash = filebase64sha256("../source/lambda.zip")
 }
 
 resource "aws_api_gateway_integration" "hello_integration" {
